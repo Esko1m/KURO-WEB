@@ -5,6 +5,54 @@ import './App.css'
 
 const AUTH_SALT = 'koen-ios-2026-7'
 
+const IconSparkle = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9L12 3z" />
+    <path d="M19 15l.9 2.4L22 18l-2.1.9L19 21l-.9-2.1L16 18l2.1-.6L19 15z" />
+  </svg>
+)
+
+const IconGrid = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <rect x="3" y="3" width="7" height="7" rx="1.5" />
+    <rect x="14" y="3" width="7" height="7" rx="1.5" />
+    <rect x="3" y="14" width="7" height="7" rx="1.5" />
+    <rect x="14" y="14" width="7" height="7" rx="1.5" />
+  </svg>
+)
+
+const IconDice = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <rect x="3" y="3" width="18" height="18" rx="4" />
+    <circle cx="8.5" cy="8.5" r="1.2" fill="currentColor" stroke="none" />
+    <circle cx="15.5" cy="8.5" r="1.2" fill="currentColor" stroke="none" />
+    <circle cx="8.5" cy="15.5" r="1.2" fill="currentColor" stroke="none" />
+    <circle cx="15.5" cy="15.5" r="1.2" fill="currentColor" stroke="none" />
+  </svg>
+)
+
+const IconKey = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="7.5" cy="15.5" r="4.5" />
+    <path d="M10.7 12.3L21 2M15 6l3 3M12 9l2 2" />
+  </svg>
+)
+
+const IconCopy = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <rect x="9" y="9" width="12" height="12" rx="2" />
+    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+  </svg>
+)
+
+const IconAlert = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z" />
+    <line x1="12" y1="9" x2="12" y2="13.5" />
+    <circle cx="12" cy="17" r="0.4" fill="currentColor" />
+  </svg>
+)
+
 const asHex = (buf) =>
   Array.from(new Uint8Array(buf))
     .map((b) => b.toString(16).padStart(2, '0'))
@@ -56,24 +104,19 @@ const formatExpiry = (iso) => {
   const d = new Date(iso)
   const diff = Math.ceil((d - new Date()) / 86400000)
   const base = d.toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' })
-  if (diff < 0) return `${base} (expired ${Math.abs(diff)}d ago)`
-  if (diff === 0) return `${base} (expires today)`
-  return `${base} (in ${diff}d)`
+  if (diff < 0) return `${base} · expired ${Math.abs(diff)}d ago`
+  if (diff === 0) return `${base} · expires today`
+  return `${base} · in ${diff}d`
 }
 
-const Field = ({ label, value, muted, ok, danger, onCopy }) => (
-  <div className="field">
-    <span className="label">{label}</span>
-    <code
-      className={`value ${muted ? 'muted' : ''} ${ok ? 'ok' : ''} ${danger ? 'danger' : ''}`}
-      onClick={() => onCopy && onCopy(value)}
-      title={onCopy ? 'Click to copy' : undefined}
-    >
-      {value}
-    </code>
+const KVRow = ({ label, value, tone, onCopy, copyLabel }) => (
+  <div className="kv">
+    <span className="kv-label">{label}</span>
+    <code className={`kv-value ${tone || ''}`}>{value}</code>
     {onCopy && (
-      <button className="copy" onClick={() => onCopy(value)}>
-        copy
+      <button type="button" className="copy-btn" onClick={() => onCopy(value)}>
+        <IconCopy />
+        {copyLabel}
       </button>
     )}
   </div>
@@ -84,29 +127,42 @@ function App() {
 
   return (
     <div className="page">
-      <nav className="tabs">
-        <button
-          type="button"
-          className={`tab ${tab === 'generator' ? 'active' : ''}`}
-          onClick={() => setTab('generator')}
-        >
-          Generator
-        </button>
-        <button
-          type="button"
-          className={`tab ${tab === 'dashboard' ? 'active' : ''}`}
-          onClick={() => setTab('dashboard')}
-        >
-          Dashboard
-        </button>
-      </nav>
+      <header className="topbar">
+        <div className="topbar-inner">
+          <div className="brand">
+            <span className="brand-mark">K</span>
+            <span className="brand-name">KURO</span>
+            <span className="brand-tag">ADMIN</span>
+          </div>
+          <nav className="tabs">
+            <button
+              type="button"
+              className={`tab ${tab === 'generator' ? 'active' : ''}`}
+              onClick={() => setTab('generator')}
+            >
+              <IconSparkle />
+              Generator
+            </button>
+            <button
+              type="button"
+              className={`tab ${tab === 'dashboard' ? 'active' : ''}`}
+              onClick={() => setTab('dashboard')}
+            >
+              <IconGrid />
+              Dashboard
+            </button>
+          </nav>
+        </div>
+      </header>
 
-      <main className="card">
-        {tab === 'generator' ? (
-          <Generator onGoDashboard={() => setTab('dashboard')} />
-        ) : (
-          <Dashboard />
-        )}
+      <main className="main">
+        <div className="card">
+          {tab === 'generator' ? (
+            <Generator onGoDashboard={() => setTab('dashboard')} />
+          ) : (
+            <Dashboard />
+          )}
+        </div>
       </main>
     </div>
   )
@@ -200,16 +256,26 @@ function Generator({ onGoDashboard }) {
 
   return (
     <>
-      <header>
-        <h1>Account Generator</h1>
-        <p>
-          Creates credentials the way <code>mkuser.mjs</code> does — password
-          hashed at rest with SHA-256, salted with <code>{AUTH_SALT}</code>, and
-          persisted to <code>koen_users</code>.
-        </p>
-      </header>
+      <div className="panel-head">
+        <div className="panel-icon">
+          <IconKey />
+        </div>
+        <div>
+          <h1 className="panel-title">Account Generator</h1>
+          <p className="panel-sub">
+            Creates credentials the way <code>mkuser.mjs</code> does — SHA-256
+            hashed with salt <code>{AUTH_SALT}</code> and persisted to{' '}
+            <code>koen_users</code>.
+          </p>
+        </div>
+      </div>
 
-      {error && <p className="banner error">{error}</p>}
+      {error && (
+        <p className="banner error">
+          <IconAlert />
+          {error}
+        </p>
+      )}
 
       <form
         className="form"
@@ -218,41 +284,46 @@ function Generator({ onGoDashboard }) {
           onCreate()
         }}
       >
-        <label>
-          <span>Username</span>
-          <input
-            type="text"
-            value={username}
-            placeholder="e.g. naomi42"
-            onChange={(e) => setUsername(e.target.value)}
-          />
-        </label>
+        <div className="form-grid">
+          <div className="field-control">
+            <span>Username</span>
+            <input
+              className="control"
+              type="text"
+              value={username}
+              placeholder="e.g. naomi42"
+              onChange={(e) => setUsername(e.target.value)}
+            />
+          </div>
+          <div className="field-control">
+            <span>Password</span>
+            <input
+              className="control"
+              type="password"
+              value={password}
+              placeholder="random if left empty"
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          </div>
+        </div>
 
-        <label>
-          <span>Password</span>
+        <div className="control-row">
+          <span className="field-label">Length</span>
           <input
-            type="password"
-            value={password}
-            placeholder="randomly generated if left empty"
-            onChange={(e) => setPassword(e.target.value)}
-          />
-        </label>
-
-        <label className="length">
-          <span>Length</span>
-          <input
+            className="range"
             type="range"
             min="8"
             max="32"
             value={passwordLength}
             onChange={(e) => setPasswordLength(Number(e.target.value))}
           />
-          <output>{passwordLength}</output>
-        </label>
+          <output className="range-output">{passwordLength}</output>
+        </div>
 
-        <div className="expiry">
-          <span className="expiry-label">Expires</span>
+        <div className="expiry-row">
+          <span className="field-label">Expires</span>
           <select
+            className="control"
             value={expiryMode}
             onChange={(e) => setExpiryMode(e.target.value)}
           >
@@ -262,6 +333,7 @@ function Generator({ onGoDashboard }) {
           </select>
           {expiryMode === 'days' && (
             <input
+              className="control"
               type="number"
               min="1"
               max="365"
@@ -271,6 +343,7 @@ function Generator({ onGoDashboard }) {
           )}
           {expiryMode === 'custom' && (
             <input
+              className="control"
               type="datetime-local"
               value={expiryDate}
               onChange={(e) => setExpiryDate(e.target.value)}
@@ -283,11 +356,20 @@ function Generator({ onGoDashboard }) {
           )}
         </div>
 
-        <div className="actions">
-          <button type="button" className="secondary" onClick={onGenerateRandom}>
+        <div className="btn-flex">
+          <button
+            type="button"
+            className="btn btn-secondary"
+            onClick={onGenerateRandom}
+          >
+            <IconDice />
             Randomize
           </button>
-          <button type="submit" className="primary" disabled={!isValid || loading}>
+          <button
+            type="submit"
+            className="btn btn-primary"
+            disabled={!isValid || loading}
+          >
             {configured ? 'Create Account' : 'Preview (not connected)'}
           </button>
         </div>
@@ -308,41 +390,39 @@ function Generator({ onGoDashboard }) {
       )}
 
       {result && (
-        <section className="result">
-          <h2>$ node scripts/mkuser.mjs {result.username} **** --key &quot;…&quot;</h2>
-          <Field
-            label="username"
-            value={result.username}
-            onCopy={(v) => copy(v, 'username')}
-          />
-          <Field
-            label="password"
-            value={result.password}
-            onCopy={(v) => copy(v, 'password')}
-          />
-          <Field
-            label="password_hash (SHA-256 + salt)"
-            value={result.passwordHash}
-            onCopy={(v) => copy(v, 'hash')}
-          />
-          <Field
-            label="expires_at"
-            value={result.expiresAt ? formatExpiry(result.expiresAt) : 'never'}
-          />
-          <Field label="hwid" value="unset — locked on first login" muted />
-          <Field
-            label="result"
-            value={created ? 'ACCOUNT CREATED' : 'NOT CREATED — CONNECT TO SUPABASE'}
-            ok={created}
-            danger={!created}
-          />
-          {copied && <p className="copied">copied {copied} to clipboard</p>}
-          {created && (
-            <button type="button" className="secondary" onClick={onGoDashboard}>
-              View user in Dashboard →
-            </button>
-          )}
-          <p className="note">Verify (no-op) salt in sync: {AUTH_SALT}</p>
+        <section className="terminal">
+          <div className="terminal-bar">
+            <span className="terminal-dot red" />
+            <span className="terminal-dot yellow" />
+            <span className="terminal-dot green" />
+            <span className="terminal-title">mkuser · result</span>
+          </div>
+          <div className="terminal-body">
+            <div className="terminal-cmd">
+              <span className="prompt">$</span> node scripts/mkuser.mjs{' '}
+              {result.username} **** --key &quot;…&quot;
+            </div>
+            <KVRow label="username" value={result.username} onCopy={(v) => copy(v, 'username')} copyLabel={copied === 'username' ? 'Copied' : 'Copy'} />
+            <KVRow label="password" value={result.password} onCopy={(v) => copy(v, 'password')} copyLabel={copied === 'password' ? 'Copied' : 'Copy'} />
+            <KVRow label="password hash" value={result.passwordHash} onCopy={(v) => copy(v, 'hash')} copyLabel={copied === 'hash' ? 'Copied' : 'Copy'} />
+            <KVRow label="expires_at" value={result.expiresAt ? formatExpiry(result.expiresAt) : 'never'} muted={!result.expiresAt} />
+            <KVRow label="hwid" value="unset — locked on first login" muted />
+            <KVRow
+              label="result"
+              value={created ? 'ACCOUNT CREATED' : 'NOT CREATED — CONNECT TO SUPABASE'}
+              tone={created ? 'ok' : 'danger'}
+            />
+            <div className="terminal-footer">
+              {created && (
+                <button type="button" className="btn btn-primary btn-sm" onClick={onGoDashboard}>
+                  View user in Dashboard
+                </button>
+              )}
+              <span className="terminal-note">
+                salt in sync: {AUTH_SALT}
+              </span>
+            </div>
+          </div>
         </section>
       )}
     </>

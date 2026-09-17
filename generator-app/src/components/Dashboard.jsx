@@ -1,6 +1,48 @@
 import { useEffect, useMemo, useState } from 'react'
 import { MIGRATION_SQL, useSupabase } from '../lib/supabase'
 
+const IconRefresh = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M21 12a9 9 0 1 1-2.6-6.3" />
+    <path d="M21 3v6h-6" />
+  </svg>
+)
+
+const IconTrash = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M3 6h18M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6M10 11v6M14 11v6" />
+  </svg>
+)
+
+const IconEye = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z" />
+    <circle cx="12" cy="12" r="3" />
+  </svg>
+)
+
+const IconLock = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <rect x="4" y="11" width="16" height="10" rx="2" />
+    <path d="M8 11V7a4 4 0 0 1 8 0v4" />
+  </svg>
+)
+
+const IconClock = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="12" cy="12" r="9" />
+    <path d="M12 7v5l3 3" />
+  </svg>
+)
+
+const IconUsers = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+    <circle cx="9" cy="7" r="4" />
+    <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
+  </svg>
+)
+
 const formatDate = (iso) => {
   if (!iso) return '—'
   return new Date(iso).toLocaleString(undefined, {
@@ -16,10 +58,12 @@ const expiryInfo = (iso) => {
   const diff = Math.ceil((new Date(iso) - new Date()) / 86400000)
   let label
   if (diff < 0) label = `expired ${Math.abs(diff)}d ago`
-  else if (diff === 0) label = `expires today`
+  else if (diff === 0) label = 'expires today'
   else label = `in ${diff}d`
   return { diff, label, expired: diff < 0 }
 }
+
+const initials = (name) => (name ? name.slice(0, 2) : '??')
 
 function Dashboard() {
   const {
@@ -101,53 +145,96 @@ function Dashboard() {
 
   return (
     <section className="dashboard">
-      <form className="connect" onSubmit={onConnect}>
-        <h2>Supabase Connection</h2>
+      <form className="connect-panel" onSubmit={onConnect}>
+        <div className="panel-head">
+          <div className="panel-icon">
+            <IconUsers />
+          </div>
+          <div>
+            <h1 className="panel-title">Supabase Connection</h1>
+            <p className="panel-sub">
+              Key is stored only in your browser (localStorage) — never commit
+              it to the repo.
+            </p>
+          </div>
+        </div>
         <div className="row">
-          <label>
+          <div className="field-control">
             <span>URL</span>
             <input
+              className="control"
               type="text"
               value={urlInput}
               placeholder="https://<ref>.supabase.co"
               onChange={(e) => setUrlInput(e.target.value)}
+              spellCheck="false"
             />
-          </label>
-          <label>
+          </div>
+          <div className="field-control">
             <span>Key</span>
             <input
+              className="control"
               type="password"
               value={keyInput}
               placeholder="service role / anon key"
               onChange={(e) => setKeyInput(e.target.value)}
+              spellCheck="false"
             />
-          </label>
-          <button type="submit" className="primary">
+          </div>
+          <button type="submit" className="btn btn-primary">
+            <IconRefresh />
             Connect
           </button>
         </div>
-        <p className="hint">
-          Stored only in your browser (localStorage). Never commit the key to
-          the repo.
-        </p>
       </form>
+
+      {configured && (
+        <div className="stat-grid">
+          <div className="stat">
+            <span className="stat-value">{stats.total}</span>
+            <span className="stat-label">Users</span>
+          </div>
+          <div className="stat stat-locked">
+            <span className="stat-value">{stats.locked}</span>
+            <span className="stat-label">HWID-locked</span>
+          </div>
+          <div className="stat">
+            <span className="stat-value">{stats.unlocked}</span>
+            <span className="stat-label">Unlocked</span>
+          </div>
+          <div className={`stat ${stats.expired > 0 ? 'stat-expired' : ''}`}>
+            <span className="stat-value">{stats.expired}</span>
+            <span className="stat-label">Expired</span>
+          </div>
+        </div>
+      )}
 
       {configured && !expirySupported && !loading && (
         <div className="setup">
-          <strong>One-time setup needed</strong>
+          <div className="setup-head">
+            <IconClock />
+            <strong>One-time setup needed</strong>
+          </div>
           <p>
             The <code>expires_at</code> column doesn&apos;t exist yet. Run this
             SQL in the Supabase SQL editor to enable expiry dates:
           </p>
           <pre>{MIGRATION_SQL}</pre>
-          <button type="button" className="secondary" onClick={copySql}>
-            {sqlCopied ? 'Copied!' : 'Copy SQL'}
-          </button>
-          <button type="button" className="ghost-btn" onClick={() => refresh()}>
-            Recheck
-          </button>
+          <div className="setup-actions">
+            <button type="button" className="btn btn-secondary btn-sm" onClick={copySql}>
+              {sqlCopied ? 'Copied to clipboard' : 'Copy SQL'}
+            </button>
+            <button type="button" className="btn btn-ghost btn-sm" onClick={() => refresh()}>
+              Recheck
+            </button>
+          </div>
         </div>
       )}
+
+      {error && (
+        <p className="banner error">{error}</p>
+      )}
+      {actionMsg && <p className="banner ok">{actionMsg}</p>}
 
       {configured && (
         <div className="toolbar">
@@ -164,37 +251,33 @@ function Dashboard() {
               }
             }}
           />
-          <button type="button" className="secondary" onClick={() => refresh()}>
+          <label className="toggle">
+            <input
+              type="checkbox"
+              checked={showHashes}
+              onChange={(e) => setShowHashes(e.target.checked)}
+            />
+            <IconEye />
+            Hashes
+          </label>
+          <button type="button" className="btn btn-secondary btn-sm" onClick={() => refresh()}>
+            <IconRefresh />
             Refresh
           </button>
-          <span className="hint">
-            {stats.total} users · {stats.locked} HWID-locked · {stats.unlocked}{' '}
-            unlocked
-            {stats.expired > 0 && ` · ${stats.expired} expired`}
-          </span>
         </div>
       )}
 
-      {error && <p className="banner error">{error}</p>}
-      {actionMsg && <p className="banner ok">{actionMsg}</p>}
-
       {configured && (
         <>
-          <div className="hash-toggle">
-            <label>
-              <input
-                type="checkbox"
-                checked={showHashes}
-                onChange={(e) => setShowHashes(e.target.checked)}
-              />
-              Reveal password hashes
-            </label>
-          </div>
-
-          {loading && <p className="hint">Loading…</p>}
+          {loading && (
+            <div className="loading">
+              <span className="spinner" />
+              Loading users…
+            </div>
+          )}
 
           {!loading && loaded && users.length === 0 && (
-            <p className="empty">No users found.</p>
+            <div className="empty">No users found.</div>
           )}
 
           {!loading && users.length > 0 && (
@@ -202,7 +285,7 @@ function Dashboard() {
               <table className="users">
                 <thead>
                   <tr>
-                    <th>Username</th>
+                    <th>User</th>
                     <th>HWID</th>
                     <th>Expires</th>
                     <th>Created</th>
@@ -216,30 +299,41 @@ function Dashboard() {
                     const exp = expiryInfo(u.expires_at)
                     return (
                       <tr key={u.id} className={exp && exp.expired ? 'expired-row' : ''}>
-                        <td className="strong">{u.username}</td>
-                        <td className={u.hwid ? 'hwid' : 'muted'}>
-                          {u.hwid || 'unset'}
+                        <td>
+                          <span className="username-cell">
+                            <span className="username-avatar">{initials(u.username)}</span>
+                            <span className="username-name">{u.username}</span>
+                          </span>
                         </td>
                         <td>
-                          {!expirySupported ? (
-                            <span className="muted">—</span>
-                          ) : exp ? (
-                            <span
-                              className={`expiry ${exp.expired ? 'expired-badge' : ''}`}
-                              title={formatDate(u.expires_at)}
-                            >
-                              {exp.expired ? 'EXPIRED' : formatDate(u.expires_at)}
-                              {' · '}
-                              {exp.label}
+                          {u.hwid ? (
+                            <span className="pill pill-lock">
+                              <IconLock />
+                              Locked
                             </span>
                           ) : (
-                            <span className="muted">never</span>
+                            <span className="pill pill-muted">Unset</span>
                           )}
                         </td>
-                        <td>{formatDate(u.created_at)}</td>
-                        <td>{formatDate(u.last_login_at)}</td>
+                        <td className="mono">
+                          {!expirySupported ? (
+                            <span className="pill pill-muted">—</span>
+                          ) : exp ? (
+                            <span
+                              className={`pill ${exp.expired ? 'pill-danger' : 'pill-ok'}`}
+                              title={formatDate(u.expires_at)}
+                            >
+                              <IconClock />
+                              {exp.expired ? 'Expired' : `In ${exp.diff}d`}
+                            </span>
+                          ) : (
+                            <span className="pill pill-muted">No expiry</span>
+                          )}
+                        </td>
+                        <td className="mono">{formatDate(u.created_at)}</td>
+                        <td className="mono">{formatDate(u.last_login_at)}</td>
                         {showHashes && (
-                          <td className="hash" title={u.password_hash}>
+                          <td className="mono" title={u.password_hash}>
                             {shortHash(u.password_hash)}
                           </td>
                         )}
@@ -248,14 +342,15 @@ function Dashboard() {
                             <span className="confirm">
                               <button
                                 type="button"
-                                className="danger"
+                                className="btn btn-danger btn-sm"
                                 onClick={() => onDelete(u.id)}
                               >
-                                Confirm delete
+                                <IconTrash />
+                                Confirm
                               </button>
                               <button
                                 type="button"
-                                className="ghost"
+                                className="btn btn-ghost btn-sm"
                                 onClick={() => setConfirmId(null)}
                               >
                                 Cancel
@@ -264,10 +359,11 @@ function Dashboard() {
                           ) : (
                             <button
                               type="button"
-                              className="danger ghost"
+                              className="btn btn-danger btn-sm"
                               disabled={loading}
                               onClick={() => setConfirmId(u.id)}
                             >
+                              <IconTrash />
                               Delete
                             </button>
                           )}
