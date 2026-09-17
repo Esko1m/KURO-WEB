@@ -1,16 +1,41 @@
-# React + Vite
+# KURO Account Generator
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+React app that generates and manages accounts the way `scripts/mkuser.mjs` does,
+backed by a Supabase `koen_users` table.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- **Generator** — pick a username/password (or randomize), optional expiry date,
+  password is SHA-256 hashed with the salt `koen-ios-2026-7` and the account is
+  persisted to Supabase (`ACCOUNT CREATED`).
+- **Dashboard** — view all users (username, HWID lock state, expiry, created, last
+  login), reveal password hashes, search by username, and delete users with an
+  inline confirmation.
 
-## React Compiler
+## Setup
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+1. `npm install`
+2. `npm run dev`
+3. Open the **Dashboard** tab and enter your Supabase URL and key (service-role
+   or anon). They are stored only in your browser's localStorage — never commit
+   a real key to this repo.
+4. Recommended: run supabase.sql once in the Supabase SQL editor.
 
-## Expanding the Oxlint configuration
+## supabase.sql
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+Adds the expiry column used by the generator's "Expires" option and the
+dashboard's expiry badges:
+
+```sql
+ALTER TABLE koen_users ADD COLUMN IF NOT EXISTS expires_at timestamptz;
+CREATE INDEX IF NOT EXISTS koen_users_expires_at_idx ON koen_users (expires_at);
+```
+
+The dashboard shows a "one-time setup needed" banner with this SQL whenever the
+column is missing.
+
+## Scripts
+
+- `npm run dev` — dev server
+- `npm run build` — production build
+- `npm run lint` — oxlint
