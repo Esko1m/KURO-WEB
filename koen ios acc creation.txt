@@ -1,0 +1,11 @@
+$ node scripts/mkuser.mjs naomi c3win --key "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9qenp0endoYmtxd3ZlaGdkemV2Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4ODA3NTk3MCwiZXhwIjoyMTAzNjUxOTcwfQ.VZ4W-gALl1RKHOGcvlQpLZmOXpoTWBK4_5t_mFFoCL0"
+username     : naomi
+password     : ***** (plain, hashed at rest)
+password_hash: 7e01492e8cc7d4097302b03e28dac103239f64c9f154213ce668d890e92d676d
+hwid         : unset — locked on first login
+result       : ACCOUNT CREATED
+
+NOTE: key came from the --key flag.
+
+Verify (no-op) salt in sync: koen-ios-2026-7
+Sync points: InjectBridgeModule.kAuthSalt, src/lib/supabase.ts AUTH_SALT

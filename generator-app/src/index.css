@@ -1,0 +1,275 @@
+:root {
+  --bg: #0e0f13;
+  --surface: #16181f;
+  --surface-2: #1d2029;
+  --border: #2a2e3a;
+  --text: #a8b0c0;
+  --text-h: #f1f3f8;
+  --accent: #7c5cff;
+  --accent-2: #38e0b0;
+  --ok: #38d67a;
+  --danger: #ff5c7a;
+  --mono: 'Cascadia Code', ui-monospace, Consolas, monospace;
+  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
+
+  color-scheme: dark;
+  font: 16px/1.55 var(--sans);
+  color: var(--text);
+  background: var(--bg);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+#root {
+  min-height: 100svh;
+}
+
+h1,
+h2 {
+  margin: 0;
+  color: var(--text-h);
+}
+
+code {
+  font-family: var(--mono);
+}
+
+button {
+  cursor: pointer;
+}
+
+.page {
+  min-height: 100svh;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 48px 16px;
+  background:
+    radial-gradient(800px 400px at 20% -10%, rgba(124, 92, 255, 0.18), transparent 60%),
+    radial-gradient(700px 400px at 90% 0%, rgba(56, 224, 176, 0.12), transparent 60%),
+    var(--bg);
+}
+
+.card {
+  width: 100%;
+  max-width: 640px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 32px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
+}
+
+.card header h1 {
+  font-size: 28px;
+  letter-spacing: -0.5px;
+}
+
+.card header p {
+  margin: 8px 0 24px;
+  color: var(--text);
+}
+
+.card header code,
+.result code {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  padding: 2px 6px;
+  border-radius: 5px;
+  font-size: 13px;
+  color: var(--accent-2);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.form label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form label > span {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  color: var(--text);
+}
+
+.form input[type='text'],
+.form input[type='password'] {
+  font-family: var(--mono);
+  font-size: 15px;
+  color: var(--text-h);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.form input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(124, 92, 255, 0.25);
+}
+
+.form .length {
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+}
+
+.form .length span {
+  text-transform: none;
+}
+
+.form .length input[type='range'] {
+  flex: 1;
+  accent-color: var(--accent);
+}
+
+.form .length output {
+  font-family: var(--mono);
+  color: var(--text-h);
+  min-width: 28px;
+  text-align: right;
+}
+
+.actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.actions button {
+  flex: 1;
+  border: none;
+  border-radius: 8px;
+  padding: 12px;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  transition: transform 0.1s, filter 0.15s;
+}
+
+.actions button:hover:not(:disabled) {
+  filter: brightness(1.1);
+}
+
+.actions button:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.actions .primary {
+  background: linear-gradient(135deg, var(--accent), #b84dff);
+  color: #fff;
+}
+
+.actions .primary:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.actions .secondary {
+  background: var(--surface-2);
+  color: var(--text-h);
+  border: 1px solid var(--border);
+}
+
+.hint {
+  font-size: 13px;
+  color: var(--text);
+  margin: 14px 0 0;
+}
+
+.result {
+  margin-top: 28px;
+  border-top: 1px dashed var(--border);
+  padding-top: 20px;
+  text-align: left;
+}
+
+.result h2 {
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  margin-bottom: 16px;
+  overflow-wrap: break-word;
+}
+
+.field {
+  display: grid;
+  grid-template-columns: 170px 1fr auto;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(42, 46, 58, 0.6);
+}
+
+.field .label {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text);
+}
+
+.field .value {
+  font-family: var(--mono);
+  font-size: 14px;
+  color: var(--text-h);
+  background: transparent;
+  border: none;
+  padding: 0;
+  overflow-wrap: anywhere;
+  cursor: pointer;
+}
+
+.field .value.muted {
+  color: var(--text);
+}
+
+.field .value.ok {
+  color: var(--ok);
+  font-weight: 700;
+}
+
+.field .copy {
+  background: var(--surface-2);
+  color: var(--text-h);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-size: 12px;
+  transition: background 0.15s;
+}
+
+.field .copy:hover {
+  background: var(--accent);
+  color: #fff;
+}
+
+.copied {
+  font-size: 13px;
+  color: var(--accent-2);
+  margin: 12px 0 0;
+}
+
+.note {
+  margin-top: 16px;
+  font-size: 12px;
+  color: var(--text);
+  font-family: var(--mono);
+}
